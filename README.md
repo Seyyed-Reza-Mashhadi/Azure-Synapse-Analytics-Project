@@ -36,9 +36,7 @@ Provisioned within the same resource group:
 
 ## 2️⃣ Serverless SQL Pool  
 
-Serverless SQL is Synapse’s **on-demand query engine** that lets you run SQL queries directly on files in **ADLS Gen2** without loading them into a database. It is ideal for **quick ad-hoc analysis** and validation of transformed outputs.  
-
-**Advantages:**  
+Serverless SQL is Synapse’s **on-demand query engine** that lets you run SQL queries directly on files in **ADLS Gen2** without loading them into a database. It is ideal for **quick ad-hoc analysis** and validation of transformed outputs. Serverless SQL Pool features include:  
 - No infrastructure provisioning required  
 - Ideal for exploration & validation of raw/processed data  
 - Can query diverse file formats (CSV, Parquet, JSON) directly  
@@ -50,7 +48,7 @@ Serverless SQL is Synapse’s **on-demand query engine** that lets you run SQL q
 
 In this project, two example for raw data queries are illustrated using serverless SQL pool:  
 
-- Queried Parquet files directly from ADLS Gen2 to get the top 5 best selling products.  
+- Queried Parquet files directly from ADLS Gen2 to get the top 5 most expensive "durable" products  
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/fd8d104b-817b-420d-b15a-4832bf08480d" width="700">
@@ -80,14 +78,16 @@ Here is an example showing a query result using the serverless SQL pool for calc
   <img src="https://github.com/user-attachments/assets/5aa2a39d-8212-498b-98a2-2e4a25a70bb0" width="700">
 </p>  
 
-**Quick Visualization in Synapse:** Note that Synapse provides some basic plotting options (bar charts, line charts, pie charts, etc.) that can be used for quick visualization of query results. These are useful for rapid validation and exploration, though more advanced analysis and dashboards are typically built in Power BI or using Apache Spark notebooks.
+**⚡Quick Visualization in Synapse:**
+
+Synapse provides some basic plotting options (bar charts, line charts, pie charts, etc.) that can be used for quick visualization of query results. These are useful for rapid validation and exploration, though more advanced analysis and dashboards are typically built in Power BI or using Apache Spark notebooks.
 
 
 ## 3️⃣ Dedicated SQL Pool  
 
-Dedicated SQL Pool is Synapse’s **provisioned data warehouse** for structured, high-performance analytics using **T-SQL**. Its use cases include:  
-- Scalable data warehouse for **BI workloads**  
-- Schema-aware integration with **Power BI**  
+Dedicated SQL Pool is **Synapse’s provisioned data warehouse** for structured, high-performance analytics using **T-SQL**. Dedicated SQL Pool features include:  
+- Scalable data warehouse for BI workloads 
+- Schema-aware integration with Power BI 
 - High-performance, repeatable queries  
 - Tables are **internal tables** (physically stored in the dedicated SQL database)  
 - **Distribution Strategies:** Tables can use **hash, round-robin, or replicated distribution** to optimize parallel processing and query performance  
@@ -95,14 +95,45 @@ Dedicated SQL Pool is Synapse’s **provisioned data warehouse** for structured,
   - Compute billing stops when paused  
   - Storage billed at ~$0.12/GB/month  
 
-In this project, processed **Parquet files** were loaded into the dedicated SQL database using **bulk load**. These files represent **fact and dimension tables** forming a **star schema**. **Primary Keys** were introduced as **metadata** to provide schema clarity for downstream analysis, without enforcing strict constraints, since Synapse Dedicated Pools are designed for **parallel, high-speed analytics**, not strict relational enforcement.  
+In this project, processed **Parquet files** were loaded into the dedicated SQL database using **bulk load**. To optimize performance, the tables in the database were created with **Round-robin distribution** (ensuring even data spread across compute nodes), and a **Clustered Columnstore Index (CCI)** was applied by default, providing high compression and efficient analytical query execution on large datasets. After loading the data into internal tables, **Primary Keys** were introduced as **metadata** to provide schema clarity for downstream analysis (e.g., Power BI), without enforcing strict constraints, since Synapse Dedicated Pools are designed for **parallel, high-speed analytics**, not strict relational enforcement.
 
-📸 *[Insert screenshot: dedicated SQL tables with PKs defined]*
+<br>
+<p align="center">
+  <i>Example: Loading data from FactSales.parquet file into the Dedicated SQL Pool table</i>
+</p>
+
+```sql
+IF NOT EXISTS (SELECT * FROM sys.objects O JOIN sys.schemas S ON O.schema_id = S.schema_id WHERE O.NAME = 'FactSales' AND O.TYPE = 'U' AND S.NAME = 'dbo')
+CREATE TABLE dbo.FactSales ([SalesID] int, [EmployeeID] int, [CustomerID] int, [ProductID] int,
+	 [Quantity] smallint, [Discount] float, [TotalPrice] float, [SalesDate] datetime2(7), [TransactionNumber] nvarchar(4000))
+WITH
+	(DISTRIBUTION = ROUND_ROBIN,
+	 CLUSTERED COLUMNSTORE INDEX
+	 -- HEAP
+	)
+GO
+--CREATE PROC bulk_load_FactSales
+--AS
+--BEGIN
+COPY INTO dbo.FactSales
+(SalesID 1, EmployeeID 2, CustomerID 3, ProductID 4, Quantity 5, Discount 6, TotalPrice 7, SalesDate 8, TransactionNumber 9)
+FROM 'https://adlsgrocery.dfs.core.windows.net/processeddata/FactSales.parquet'
+WITH (FILE_TYPE = 'PARQUET', MAXERRORS = 0 ,CREDENTIAL = ( IDENTITY = 'Managed Identity' ))
+--END
+GO
+```
+
+<br>
+- A query to get the top 5 best selling products (i.e., with highest generated revenue)
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/e1296dd9-35a1-464a-85e1-d78325dfec55" width="700">
+</p>  
 
 
 ## 4️⃣ Apache Spark Pool  
 
-Apache Spark in Synapse enables **data exploration, transformation, and visualization** using **Python / PySpark / ML libraries**. It is ideal for flexible analytics and exploratory data science workloads. It is used for:  
+Apache Spark in Synapse enables **data exploration, transformation, and visualization** using **Python / PySpark / ML libraries**. It is ideal for flexible analytics and exploratory data science workloads. Apache Spark features include:  
 - Flexible data manipulation with **Python / PySpark / ML libraries**  
 - Native integration with Synapse workspace for analytics & visualization  
 - Suitable for **exploratory data science workloads**  
@@ -112,14 +143,15 @@ Apache Spark in Synapse enables **data exploration, transformation, and visualiz
   - Must stop pool to avoid charges when not in use  
   - No persistent storage cost unless explicitly writing outputs  
 
-In this project, a **histogram of customer total spendings** is created using PySpark following the steps below:  
+**Example**
+In this project, a histogram of customer total spendings is created using PySpark following the steps below:  
 - Read `FactSales` and `DimCustomers` parquet files from ADLS container.  
 - Perform proper joins & aggregations (e.g., total spending per customer) and store results in a dataframe.  
 - Calculate the median value of customer spending.  
-- Generate the **histogram of customer spendings** using **matplotlib.pyplot**, plotting the median as a line.
+- Generate the histogram of customer spendings using matplotlib.pyplot, plotting the median as a line.
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/7bde6f23-0cc0-4969-9f88-d5ea71b1fdb1" width="700">
+  <img src="https://github.com/user-attachments/assets/45d2c131-1e6c-467b-afca-6940970d5ba8" width="900">
 </p>  
 
 
