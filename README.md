@@ -46,7 +46,7 @@ Serverless SQL is Synapse’s **on-demand query engine** that lets you run SQL q
 
 ### **Query Raw Data**
 
-In this project, two example for raw data queries are illustrated using serverless SQL pool:  
+In this project, two example queries for raw data are illustrated using serverless SQL pool:  
 
 - Queried Parquet files directly from ADLS Gen2 to get the top 5 most expensive "durable" products [[View SQL File](https://github.com/Seyyed-Reza-Mashhadi/Azure-Synapse-Analytics-Project/blob/main/SQL%20files/0_Direct_Query_csv.sql)]  
 
@@ -93,10 +93,10 @@ Dedicated SQL Pool is **Synapse’s provisioned data warehouse** for structured,
   - Compute billing stops when paused  
   - Storage billed at ~$0.12/GB/month  
 
-In this project, processed **Parquet files** were loaded into the dedicated SQL database using **bulk load**. To optimize performance, the tables in the database were created with **Round-robin distribution** (ensuring even data spread across compute nodes), and a **Clustered Columnstore Index (CCI)** was applied by default, providing high compression and efficient analytical query execution on large datasets. After loading the data into internal tables, **Primary Keys** were introduced as **metadata** to provide schema clarity for downstream analysis (e.g., Power BI), without enforcing strict constraints, since Synapse Dedicated Pools are designed for **parallel, high-speed analytics**, not strict relational enforcement.
+In this project, processed **Parquet files** were loaded into the dedicated SQL database using **bulk load**. To optimize performance, the tables in the database were created with **Round-robin distribution** (ensuring even data spread across compute nodes), and a **Clustered Columnstore Index (CCI)** was applied by default, providing high compression and efficient analytical query execution on large datasets. **Primary Keys** were added as **metadata** after loading, to provide schema clarity for downstream analysis (e.g., Power BI), without enforcing strict constraints, since Synapse Dedicated Pools are designed for **parallel, high-speed analytics**, not strict relational enforcement.
 
 **Query Example**
-- A query to get the top 5 best selling products (i.e., with highest generated revenue) [[View SQL File](https://github.com/Seyyed-Reza-Mashhadi/Azure-Synapse-Analytics-Project/blob/main/SQL%20files/2_Dedicated_Query_2.sql)]
+- Example of a T-SQL query to get the top 5 best-selling products (i.e., products with highest generated revenue) [[View SQL File](https://github.com/Seyyed-Reza-Mashhadi/Azure-Synapse-Analytics-Project/blob/main/SQL%20files/2_Dedicated_Query_2.sql)]
 
 <br>
 
@@ -122,7 +122,7 @@ In this project, the histogram of customer total spendings is created using PySp
 - Read `FactSales` and `DimCustomers` parquet files from ADLS container.  
 - Perform proper joins & aggregations (e.g., total spending per customer) and store results in a dataframe.  
 - Calculate the median value of customer spending.  
-- Generate the histogram of customer spendings using matplotlib.pyplot, plotting the median as a line.
+- Generate the histogram of customer spendings using matplotlib.pyplot, with the median indicated by a dashed line.
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/45d2c131-1e6c-467b-afca-6940970d5ba8" width="900">
@@ -132,68 +132,58 @@ In this project, the histogram of customer total spendings is created using PySp
 
 There are two ways of connecting **Azure Synapse** with **Power BI**:  
 
-- **Power BI Desktop** → Connect using server name + credentials.  
-- **Power BI Service (Online)** → Link Synapse workspace as a **Linked Service** for managed connectivity.  
+- Power BI Desktop → Connect using server name + credentials.  
+- Power BI Service (Online) → Link Synapse workspace as a Linked Service for managed connectivity.  
 
 
-⚠️ **Note:** In this project, we focused on **Synapse itself** and did not perform any dashboarding or reporting beyond connecting the Synapse SQL Pools to Power BI. For full dashboards, reporting, and visualization examples, please refer to the **Related Projects** section below.
+⚠️ **Note:** In this project, we focused on Synapse itself and did not perform any dashboarding or reporting beyond connecting the Synapse SQL Pools to Power BI. For full dashboards, reporting, and visualization examples, please refer to the Related Projects section below.
 
   
-# 🔄 Synapse vs. ADF  
-
-| Feature              | **Azure Data Factory (ADF)** | **Azure Synapse Analytics** |
-|----------------------|-------------------------------|-----------------------------|
-| **Primary Focus**    | ETL/ELT (data movement & transformation) | Analytics & data warehousing |
-| **Data Handling**    | Ingest, clean, transform data | Query, model, visualize data |
-| **Core Strengths**   | Pipelines, data orchestration | Serverless queries, Spark, Dedicated SQL pools |
-| **Integration**      | Data prep for downstream use | BI-ready datasets & analysis |
-| **Best For**         | Preparing structured data | Exploring & analyzing data |
-
-👉 In short: **ADF = Data Preparation**, **Synapse = Data Analysis**  
-
----
-
 # 💰 Cost Considerations  
-
+## 📋 Overview
 The approximate costs for Azure Synapse services are as follows:  
 
 - **Serverless SQL Pool** → ~$5/TB scanned (minimum 10 MB/query)  
 - **Dedicated SQL Pool** → Pay for DWUs (compute billed when active, storage billed separately)  
 - **Apache Spark Pool** → Pay for vCore-hours while running  
 
-Thus, here are some **General Recommendations**:
+## 📋 General Recommendations
 - When using Serverless SQL Pool, **partition large files** to query only the required portion of data. This reduces the amount of data scanned and lowers costs.  
 - Use **optimized file formats** such as Parquet or Delta instead of CSV for better performance and lower cost.  
 - Use the **Cost Control** option to set daily/weekly/yearly limits when using Serverless SQL Pool, preventing accidental overspending due to errors or misconfigured queries.
 - **Pause/stop provisioned compute resources** (Dedicated SQL Pool and Apache Spark) when idle to avoid unnecessary charges.  
 
-💡 **Special Considerations when Connecting to Power BI**  
+## 💡Special Considerations when Connecting to Power BI 
 
 Since cost models differ between **Serverless** and **Dedicated SQL Pools**, careful selection of connection/refresh strategy is important:  
 
 - **Serverless SQL Pool**:  
-  - Only DirectQuery / Live Connection is available (no import option).  
+  - Only **DirectQuery / Live Connection** is available (no import option).  
   - Manual refresh is recommended over automatic refresh to minimize the number of queries, reducing costs.  
 
 - **Dedicated SQL Pool**:  
-  - Both Import and DirectQuery options are available.  
+  - Both **Import** and **DirectQuery** options are available.  
   - Importing data is suitable for smaller datasets to improve performance.  
   - Always pause the dedicated SQL pool when not in use to avoid unnecessary compute charges.  
 
 
+## 🔑 Technical Highlights  
 
-# 🔑 Key Features  
+This project demonstrates practical expertise in **Azure Synapse Analytics**, focusing on key compute options, query engines, and integration capabilities including:
+- **Serverless SQL Pool**: ad-hoc queries on raw/processed files in ADLS Gen2; cost-efficient pay-per-query model.  
+- **Dedicated SQL Pool**: high-performance analytics; internal tables with **Round-robin distribution** and **Clustered Columnstore Index (CCI)**; metadata primary keys for schema clarity.  
+- **Apache Spark Pool**: flexible exploration, aggregation, and visualization using **PySpark**; supports integration with ADLS and Dedicated SQL Pool.  
+- **Query & Analysis**: demonstrated multiple query approaches, external tables, and basic Synapse visualizations.  
+- **Cost Awareness**: insights into serverless vs. dedicated vs. Spark cost models; recommended strategies for efficient usage.  
+- **Integration Readiness**: connected Synapse SQL pools with Power BI for downstream reporting.  
 
-- Queried data directly from ADLS without ETL (Serverless SQL)  
-- Built star schema in Dedicated SQL Pool  
-- Integrated schema with Power BI for BI readiness  
-- Used Apache Spark for aggregations & visualizations  
-- Compared Synapse vs. ADF for clear separation of concerns  
-- Highlighted cost efficiency across compute options  
-
+⚠️ **Note:** Synapse also provides **pipelines** and **data flows** for ETL/ELT orchestration, but these are not covered here. For a detailed demonstration, see the **Azure Data Factory Project** via the link provided in the Related Projects section below.  
 
 # 🔁 Related Projects  
 
-📊 **Azure Data Factory Project** → End-to-end ETL pipelines & star schema prep  
-📊 **SQL Project** → PostgreSQL analytics on Grocery Sales dataset  
-📊 **Power BI Dashboard** → Interactive visual exploration of sales & customer insights  
+These projects independently explore the same dataset with different objectives. Feel free to check them out:  
+- ☁️ [Azure Data Factory Project](https://github.com/Seyyed-Reza-Mashhadi/Azure-Data-Factory-Project): This project demonstrates a complete ETL pipeline and data orchestration using Azure Cloud Services, including Azure Data Factory (ADF), Azure Data Lake Storage Gen2 (ADLS), and Azure SQL Database. 
+- 📊 [Power BI Dashboard – Grocery Sales](https://github.com/Seyyed-Reza-Mashhadi/Power-BI-Project_Grocery-Sales): An interactive dashboard that visually explores key trends including sales performance, product demand, customer spending metrics, employee highlights, and regional insights.
+- 🗄️ [SQL Project – Grocery Sales](https://github.com/Seyyed-Reza-Mashhadi/SQL-Project_Grocery-Sales): This companion project presents the PostgreSQL database design and extensive analytical SQL queries. It provides deep dives into revenue trends, customer segmentation, product performance, and employee effectiveness.
+
+
