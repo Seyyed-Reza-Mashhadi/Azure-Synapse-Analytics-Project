@@ -2,15 +2,12 @@
 
 # ☁️ Azure Synapse Analytics Project  
 
-This project demonstrates how to perform analytics directly in **Azure Synapse Analytics**, using different query engines and compute options.  
-
-Building on the **cleaned Parquet data** produced by the **Azure Data Factory Project**, the focus here is on querying, modeling, and analyzing the data using:  
-
+This project demonstrates how to perform analytics directly in **Azure Synapse Analytics**, leveraging different query engines and compute options. Using both the cleaned Parquet data produced by the Azure Data Factory project and the raw CSV files, the focus is on showcasing various Synapse tools for querying, modeling, and analyzing data, including:  
 - **Serverless SQL Pools** (on-demand queries)  
 - **Dedicated SQL Pools** (provisioned compute for structured analytics)  
-- **Apache Spark Pools** (advanced data exploration & visualization)  
+- **Apache Spark Pools** (data exploration, transformation, and visualization)  
 
-🔗 **Dataset:** The data is available on [Kaggle](https://www.kaggle.com/datasets/155a87ba8d7e92c5896ddc7f3ca3e3fa9c799207ed8dbf9a1cedf2e2e03e3c14). CSV files and processed Parquet outputs were already available in **ADLS**, prepared via pipelines from the [Azure Data Factory Project](https://github.com/Seyyed-Reza-Mashhadi/Azure-Data-Factory-Project).  
+🔗 **Dataset:** The data is available on [Kaggle](https://www.kaggle.com/datasets/155a87ba8d7e92c5896ddc7f3ca3e3fa9c799207ed8dbf9a1cedf2e2e03e3c14). Raw CSV files and processed Parquet outputs were already available in ADLS, prepared via pipelines from the [Azure Data Factory Project](https://github.com/Seyyed-Reza-Mashhadi/Azure-Data-Factory-Project).  
 
 
 ## 🎯 Project Goals  
@@ -21,7 +18,6 @@ Building on the **cleaned Parquet data** produced by the **Azure Data Factory Pr
 - Enable **seamless Power BI integration** with Synapse for interactive dashboards  
 - Provide a **reusable reference architecture** for modern data analytics on Azure  
 
----
 
 # ⚙️ Step-by-Step Implementation  
 
@@ -40,28 +36,51 @@ Provisioned within the same resource group:
 
 ## 2️⃣ Serverless SQL Pool  
 
-Serverless SQL is Synapse’s **on-demand query engine** that lets you run **T-SQL queries** directly on files in ADLS without loading them into a database. It is ideal for quick ad-hoc analysis, exploration, and validation of transformed outputs. The advantages of using Serverless SQL pool include:  
+Serverless SQL is Synapse’s **on-demand query engine** that lets you run SQL queries directly on files in **ADLS Gen2** without loading them into a database. It is ideal for **quick ad-hoc analysis** and validation of transformed outputs.  
+
+**Advantages:**  
 - No infrastructure provisioning required  
-- Ideal for **exploration & validation** of raw/processed data  
+- Ideal for exploration & validation of raw/processed data  
 - Can query diverse file formats (CSV, Parquet, JSON) directly  
-- Tables are **external tables** (data remains in ADLS; not physically loaded)  
 - **Cost Model:** pay only per query (cost-efficient)  
   - ~$5 per TB of data processed  
   - Minimum 10 MB per query (even for smaller files → still very cheap)  
-  - Optional: **set query data volume limit** to avoid unexpected costs  
 
-In this project, two example queries are performed using serverless SQL pool:  
-- Queried raw CSV directly from ADLS Gen2 to get the total number of cities with sales.  
+### **Query Raw Data**
 
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/e27d7e2f-797e-468c-b93c-fa3edffbab8d" width="700">
-</p>  
+In this project, two example for raw data queries are illustrated using serverless SQL pool:  
 
 - Queried Parquet files directly from ADLS Gen2 to get the top 5 best selling products.  
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/fd8d104b-817b-420d-b15a-4832bf08480d" width="700">
 </p>  
+
+- Queried raw CSV directly from ADLS Gen2 to get the total number of cities with sales.  
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/e27d7e2f-797e-468c-b93c-fa3edffbab8d" width="700">
+</p>  
+
+
+
+### **Query External Tables**
+
+Serverless SQL pool also supports **external tables**, which are metadata definitions inside the database that point to files in ADLS.  
+Key points about external tables:  
+- The data itself remains in ADLS; the table only stores schema and location metadata  
+- Allows querying raw or processed data as if it were a normal table in SQL  
+- Useful for consistent queries, schema enforcement, and integration with views or downstream pipelines  
+- Tables in serverless SQL pool are external by default (this is the opposite of dedicated SQL pool where tables are internal and data is physically stored in the database)  
+
+Here is an example showing a query result using the serverless SQL pool for calculating the total revenue generated by different product categories. 
+
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/5aa2a39d-8212-498b-98a2-2e4a25a70bb0" width="700">
+</p>  
+
+**Quick Visualization in Synapse:** Note that Synapse provides some basic plotting options (bar charts, line charts, pie charts, etc.) that can be used for quick visualization of query results. These are useful for rapid validation and exploration, though more advanced analysis and dashboards are typically built in Power BI or using Apache Spark notebooks.
 
 
 ## 3️⃣ Dedicated SQL Pool  
@@ -83,26 +102,25 @@ In this project, processed **Parquet files** were loaded into the dedicated SQL 
 
 ## 4️⃣ Apache Spark Pool  
 
-Apache Spark in Synapse enables **data exploration, transformation, and visualization** using **Python / PySpark / ML libraries**. It is ideal for flexible analytics and exploratory data science workloads.  
-
-**Use Cases / Advantages**  
+Apache Spark in Synapse enables **data exploration, transformation, and visualization** using **Python / PySpark / ML libraries**. It is ideal for flexible analytics and exploratory data science workloads. It is used for:  
 - Flexible data manipulation with **Python / PySpark / ML libraries**  
 - Native integration with Synapse workspace for analytics & visualization  
 - Suitable for **exploratory data science workloads**  
-- Supports reading/writing from **ADLS Gen2**, **Dedicated SQL Pool**, or other external sources  
+- Supports reading/writing from **ADLS Gen2**, **Dedicated SQL Pool**, or other external sources
+- Spark notebooks can also be **integrated into Synapse pipelines** for scheduled or automated data processing, similar to Azure Data Factory pipelines.
+- **Cost Model:** Billed per vCore-hour while the pool is running  
+  - Must stop pool to avoid charges when not in use  
+  - No persistent storage cost unless explicitly writing outputs  
 
-**Cost Model**  
-- Billed per **vCore-hour** while the pool is running  
-- Must **stop pool** to avoid charges  
-- No persistent storage cost unless explicitly writing outputs  
+In this project, a **histogram of customer total spendings** is created using PySpark following the steps below:  
+- Read `FactSales` and `DimCustomers` parquet files from ADLS container.  
+- Perform proper joins & aggregations (e.g., total spending per customer) and store results in a dataframe.  
+- Calculate the median value of customer spending.  
+- Generate the **histogram of customer spendings** using **matplotlib.pyplot**, plotting the median as a line.
 
-**Work Done / Examples**  
-- Read **Parquet fact (SalesFact)** and **dimension (CustomerDim)** tables from ADLS  
-- Performed **joins & aggregations** (e.g., total spending per customer)  
-- Plotted **histogram of customer spendings** with median line  
-
-📸 *[Insert screenshot: histogram of customer spendings]*
-
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/7bde6f23-0cc0-4969-9f88-d5ea71b1fdb1" width="700">
+</p>  
 
 
 ## 5️⃣ Connection to Power BI  
@@ -140,7 +158,6 @@ Validated schema recognition and confirmed readiness for **dashboarding & BI ana
   - Partition files for more efficient queries  
   - Use Parquet/Delta instead of CSV for cost + performance  
 
----
 
 # 🔑 Key Features  
 
@@ -151,7 +168,6 @@ Validated schema recognition and confirmed readiness for **dashboarding & BI ana
 - Compared Synapse vs. ADF for clear separation of concerns  
 - Highlighted cost efficiency across compute options  
 
----
 
 # 🔁 Related Projects  
 
