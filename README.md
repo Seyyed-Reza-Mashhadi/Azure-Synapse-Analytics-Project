@@ -48,13 +48,13 @@ Serverless SQL is Synapse’s **on-demand query engine** that lets you run SQL q
 
 In this project, two example for raw data queries are illustrated using serverless SQL pool:  
 
-- Queried Parquet files directly from ADLS Gen2 to get the top 5 most expensive "durable" products  
+- Queried Parquet files directly from ADLS Gen2 to get the top 5 most expensive "durable" products [[View SQL File](https://github.com/Seyyed-Reza-Mashhadi/Azure-Synapse-Analytics-Project/blob/main/SQL%20files/0_Direct_Query_csv.sql)]  
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/fd8d104b-817b-420d-b15a-4832bf08480d" width="700">
 </p>  
 
-- Queried raw CSV directly from ADLS Gen2 to get the total number of cities with sales.  
+- Queried raw CSV directly from ADLS Gen2 to get the total number of cities with sales [[View SQL File](https://github.com/Seyyed-Reza-Mashhadi/Azure-Synapse-Analytics-Project/blob/main/SQL%20files/0_Direct_Query_parquet.sql)]    
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/e27d7e2f-797e-468c-b93c-fa3edffbab8d" width="700">
@@ -124,7 +124,11 @@ GO
 ```
 
 <br>
-- A query to get the top 5 best selling products (i.e., with highest generated revenue)
+
+**Query Example**
+- A query to get the top 5 best selling products (i.e., with highest generated revenue) [[View SQL File](https://github.com/Seyyed-Reza-Mashhadi/Azure-Synapse-Analytics-Project/blob/main/SQL%20files/2_Dedicated_Query_2.sql)]
+
+<br>
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/e1296dd9-35a1-464a-85e1-d78325dfec55" width="700">
@@ -144,7 +148,7 @@ Apache Spark in Synapse enables **data exploration, transformation, and visualiz
   - No persistent storage cost unless explicitly writing outputs  
 
 **Example**
-In this project, a histogram of customer total spendings is created using PySpark following the steps below:  
+In this project, a histogram of customer total spendings is created using PySpark notebook ([View Notebook](https://github.com/Seyyed-Reza-Mashhadi/Azure-Synapse-Analytics-Project/blob/main/Notebook_CustomersSpending.ipynb)) following the steps below:  
 - Read `FactSales` and `DimCustomers` parquet files from ADLS container.  
 - Perform proper joins & aggregations (e.g., total spending per customer) and store results in a dataframe.  
 - Calculate the median value of customer spending.  
