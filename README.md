@@ -2,33 +2,29 @@
 
 # ☁️ Azure Synapse Analytics Project  
 
-This project demonstrates how to perform analytics directly in **Azure Synapse Analytics**, leveraging different query engines and compute options. Using both the cleaned Parquet data produced by the Azure Data Factory project and the raw CSV files, the focus is on showcasing various Synapse tools for querying, modeling, and analyzing data, including:  
-- **Serverless SQL Pools** (on-demand queries)  
-- **Dedicated SQL Pools** (provisioned compute for structured analytics)  
-- **Apache Spark Pools** (data exploration, transformation, and visualization)  
+This project is a hands-on exploration of **Azure Synapse Analytics**, demonstrating how to leverage its integrated analytics service to perform everything from ad-hoc data exploration to building a structured data warehouse. By applying different Synapse engines—**Serverless SQL**, **Dedicated SQL**, and **Spark**—to the same dataset, it provides a clear framework for choosing the right tool based on cost, performance, and use-case requirements.
 
-🔗 **Dataset:** The data is available on [Kaggle](https://www.kaggle.com/datasets/155a87ba8d7e92c5896ddc7f3ca3e3fa9c799207ed8dbf9a1cedf2e2e03e3c14). Raw CSV files and processed Parquet outputs were already available in ADLS, prepared via pipelines from the [Azure Data Factory Project](https://github.com/Seyyed-Reza-Mashhadi/Azure-Data-Factory-Project).  
+🔗 **Dataset:** Grocery sales transactions sourced from [Kaggle](https://www.kaggle.com/datasets/155a87ba8d7e92c5896ddc7f3ca3e3fa9c799207ed8dbf9a1cedf2e2e03e3c14), stored in **Azure Data Lake Gen2 (ADLS)** as both raw CSVs and cleaned Parquet files processed by a previous [Azure Data Factory pipeline](https://github.com/Seyyed-Reza-Mashhadi/Azure-Data-Factory-Project).  
 
 
 ## 🎯 Project Goals  
 
-- Showcase how **different Synapse compute engines** (Serverless SQL, Dedicated SQL, Spark) can be applied to the same dataset  
-- Demonstrate **end-to-end analytics workflow**: raw data exploration → star schema modeling → BI readiness  
-- Highlight **cost-efficient data analysis strategies** in Synapse (when to use serverless vs. dedicated vs. Spark)  
-- Enable **seamless Power BI integration** with Synapse for interactive dashboards  
-- Provide a **reusable reference architecture** for modern data analytics on Azure  
-
+- **Compare Synapse Engines:** Showcase the distinct roles of Serverless SQL (ad-hoc querying), Dedicated SQL (modeled warehousing), and Spark (exploration/visualization) within a single analytics workflow.
+- **Implement an Analytics Pipeline:** Progress from raw data exploration to a optimized star schema data model, ready for business intelligence.
+- **Optimize for Cost & Performance:** Highlight cost-efficient strategies (e.g., serverless for exploration, pausing dedicated pools) and performance optimizations like Round-robin distribution and Columnstore indexes.
+- **Enable BI Integration:** Connect Synapse SQL pools to Power BI, demonstrating a seamless path from data lake to dashboard.
+- **Provide a Reference Architecture:** Document a reusable, scalable pattern for modern analytics on Microsoft Azure.
 
 # ⚙️ Step-by-Step Implementation  
 
 ## 1️⃣ Azure Resources  
 
-Provisioned within the same resource group:  
-- **Azure Data Lake Storage Gen2** → contains raw CSVs + cleaned Parquet outputs  
-- **Azure Synapse Analytics** (workspace) with:  
-  - **Serverless SQL Pool** → default, on-demand queries  
-  - **Dedicated SQL Pool** → provisioned compute, relational schema  
-  - **Apache Spark Pool** → notebooks for data exploration & visualization  
+The following resources were provisioned within the same resource group to build this analytics solution:
+- **Azure Data Lake Storage Gen2** →  The foundational storage layer containing all raw and processed data files.  
+- **Azure Synapse Analytics Workspace**: The integrated analytics service containing:  
+  - A **Serverless SQL Pool** for on-demand querying.
+  - A **Dedicated SQL Pool** (data warehouse) for modeled data.
+  - An **Apache Spark Pool** for data engineering and data science tasks.
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/7ecaa9df-effd-4269-919a-13101035960a" width="350">
