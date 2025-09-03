@@ -1,7 +1,8 @@
+
+<h1 align="center">☁️ Azure Synapse Analytics Project</h1>  
 <img width="1919" height="500" alt="banner" src="https://github.com/user-attachments/assets/8e49e8dd-418d-418c-bbbb-e9ff81318cdc" />
-
-# ☁️ Azure Synapse Analytics Project  
-
+  
+## 🧩 About Project
 This project is a hands-on exploration of **Azure Synapse Analytics**, demonstrating how to leverage its integrated analytics service to perform everything from ad-hoc data exploration to building a structured data warehouse. By applying different Synapse engines—**Serverless SQL**, **Dedicated SQL**, and **Spark**—to the same dataset, it provides a clear framework for choosing the right tool based on cost, performance, and use-case requirements.
 
 🔗 **Dataset:** Grocery sales transactions sourced from [Kaggle](https://www.kaggle.com/datasets/155a87ba8d7e92c5896ddc7f3ca3e3fa9c799207ed8dbf9a1cedf2e2e03e3c14), stored in **Azure Data Lake Gen2 (ADLS)** as both raw CSVs and cleaned Parquet files processed by a previous [Azure Data Factory pipeline](https://github.com/Seyyed-Reza-Mashhadi/Azure-Data-Factory-Project).  
@@ -141,28 +142,35 @@ There are two ways of connecting **Azure Synapse** with **Power BI**:
 # 💰 Cost Considerations  
 ## 📋 Overview
 Here is an overview of the cost models for core Synapse services.
+<table>
+  <tr>
+    <th width="25%" align="center">Resource</th>
+    <th width="30%" align="center">Cost Model</th>
+    <th width="45%" align="center">Key Cost-Saving Tip</th>
+  </tr>
+  <tr>
+    <td align="center"><b>Serverless SQL Pool</b></td>
+    <td align="center">~$5 per TB processed</td>
+    <td align="center">Use Cost Control limits; query partitioned Parquet/Delta files (if possible).</td>
+  </tr>
+  <tr>
+    <td align="center"><b>Dedicated SQL Pool</b></td>
+    <td align="center">DWU-hours (compute) + Storage (~$0.12/GB/month)</td>
+    <td align="center">Pause compute when not in use.</td>
+  </tr>
+  <tr>
+    <td align="center"><b>Apache Spark Pool</b></td>
+    <td align="center">vCore-hours</td>
+    <td align="center">Stop the pool when not in use.</td>
+  </tr>
+</table>
 
-| Resource                | Cost Model                       | Key Cost-Saving Tip                                 |
-| ----------------------- | -------------------------------- | --------------------------------------------------- |
-| **Serverless SQL Pool** | ~$5 per TB processed             | Use Cost Control limits; query partitioned Parquet/Delta files (if possible). |
-| **Dedicated SQL Pool** | DWU-hours (compute) + Storage (~$0.12/GB/month)  | Pause compute when not in use.                      |
-| **Apache Spark Pool** | vCore-hours                      | Stop the pool when not in use.                      |
 
 ## 📋 General Recommendations
 - When using Serverless SQL Pool, **partition large files** to query only the required portion of data. This reduces the amount of data scanned and lowers costs.
-
 - Use **optimized file formats** such as Parquet or Delta instead of CSV for better performance and lower cost.
-
 - Use the **Cost Control** option to set daily/weekly/yearly limits when using Serverless SQL Pool, preventing accidental overspending due to errors or misconfigured queries.
-
 -  **Pause/stop provisioned compute resources** (Dedicated SQL Pool and Apache Spark) when idle to avoid unnecessary charges.
-
--
--
-- When using Serverless SQL Pool, **partition large files** to query only the required portion of data. This reduces the amount of data scanned and lowers costs.  
-- Use **optimized file formats** such as Parquet or Delta instead of CSV for better performance and lower cost.  
-- Use the **Cost Control** option to set daily/weekly/yearly limits when using Serverless SQL Pool, preventing accidental overspending due to errors or misconfigured queries.
-- **Pause/stop provisioned compute resources** (Dedicated SQL Pool and Apache Spark) when idle to avoid unnecessary charges.  
 
 ## 💡 Special Considerations when Connecting to Power BI 
 
