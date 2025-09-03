@@ -179,11 +179,19 @@ Since cost models differ between **Serverless** and **Dedicated SQL Pools**, car
 - **Serverless SQL Pool**:  
   - Only **DirectQuery / Live Connection** is available (no import option).  
   - Manual refresh is recommended over automatic refresh to minimize the number of queries, reducing costs.  
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/8896a4cd-e8e8-4c9e-91d0-288d0cf99411" width="700">
+</p>
 
 - **Dedicated SQL Pool**:  
   - Both **Import** and **DirectQuery** options are available.  
   - Importing data is suitable for smaller datasets to improve performance.  
   - Always pause the dedicated SQL pool when not in use to avoid unnecessary compute charges.  
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/bff93499-494d-4141-b148-974d64beb1a3" width="700">
+</p>
+
 
 
 ## 🔑 Technical Highlights  
